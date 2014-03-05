@@ -7,8 +7,10 @@ import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
 import android.util.DisplayMetrics;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
@@ -41,7 +43,7 @@ public class BallsManager {
 		if (restoredViewList.isEmpty()) {
 			ImageView iv = new ImageView(context);
 			iv.setTag(Boolean.valueOf(false));
-			iv.setOnClickListener(onClickListener);
+			iv.setOnTouchListener(onTouchListener);
 			container.addView(iv);
 			return setUpBall(iv);
 		} else {
@@ -78,6 +80,15 @@ public class BallsManager {
 		}
 	};
 
+	private OnTouchListener onTouchListener = new OnTouchListener() {
+		
+		@Override
+		public boolean onTouch(View v, MotionEvent event) {
+			v.setTag(Boolean.valueOf(true));
+			return false;
+		}
+	};
+	
 	public class ColorGenerator {
 		private int colorArr[];
 		private Random rand;
