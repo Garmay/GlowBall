@@ -1,5 +1,8 @@
 package com.example.glowball;
 
+import java.util.Random;
+
+import android.R.color;
 import android.animation.Animator;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
@@ -9,15 +12,18 @@ import android.animation.ValueAnimator.AnimatorUpdateListener;
 import android.app.Activity;
 import android.app.Fragment;
 import android.content.Context;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.LinearInterpolator;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 public class GlowBallFragment extends Fragment {
 
@@ -27,7 +33,10 @@ public class GlowBallFragment extends Fragment {
 	private int screenHeight;
 	private LinearInterpolator linearInterpolator;
 	private boolean closeThread=false;
-
+	private ImageView underLine;
+	private TextView scoreTxt;
+	private int currentColor;
+	
 	@Override
 	public void onPause() {
 		super.onPause();
@@ -60,7 +69,11 @@ public class GlowBallFragment extends Fragment {
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
 		ballsManager = new BallsManager(context,(ViewGroup) getActivity().findViewById(R.id.game_main));
-		handler.post(ballGenerator);
+		underLine = (ImageView)getActivity().findViewById(R.id.underLine);
+		underLine.setBackgroundColor(currentColor=ballsManager.colorGenerator.getColor());
+		scoreTxt = (TextView)getActivity().findViewById(R.id.score);
+		
+		handler.post(ballGenerator);//must be at the bottom of the code
 	}
 	
 	private Runnable ballGenerator = new Runnable(){
@@ -74,7 +87,7 @@ public class GlowBallFragment extends Fragment {
 	};
 	
 	private void moveBall(final ImageView ball){
-		ValueAnimator va = ValueAnimator.ofInt(0,screenHeight);
+		ValueAnimator va = ValueAnimator.ofInt(0,screenHeight-(100+underLine.getHeight()));
 		va.setDuration(3500);
 		va.setInterpolator(linearInterpolator);
 		va.addUpdateListener(new AnimatorUpdateListener() {
@@ -101,7 +114,26 @@ public class GlowBallFragment extends Fragment {
 			
 			@Override
 			public void onAnimationEnd(Animator animation) {	
+				String s = (String) scoreTxt.getText();
+				int score = Integer.parseInt(s);
 				
+				if((Boolean) ball.getTag()){//Has been touched
+					if(currentColor==((ColorDrawable)ball.getBackground()).getColor()){//the same color
+						score-=10;
+					}
+					else{//not the same color
+						score+=5;
+					}
+				}
+				else{//Has not been touched
+					if(currentColor==((ColorDrawable)ball.getBackground()).getColor()){//the same color
+						score+=10;
+					}
+					else{//not the same color
+						score-=20;
+					}
+				}
+				scoreTxt.setText(""+score);
 				ValueAnimator alpha = ObjectAnimator.ofFloat(ball, "alpha", 1.0f,0f);
 				ValueAnimator scaleX = ObjectAnimator.ofFloat(ball, "scaleX",0f);
 				ValueAnimator scaleY = ObjectAnimator.ofFloat(ball, "scaleY",0f);
@@ -113,39 +145,37 @@ public class GlowBallFragment extends Fragment {
 					
 					@Override
 					public void onAnimationStart(Animator animation) {
-						// TODO Auto-generated method stub
+						
 						
 					}
 					
 					@Override
 					public void onAnimationRepeat(Animator animation) {
-						// TODO Auto-generated method stub
+						
 						
 					}
 					
 					@Override
 					public void onAnimationEnd(Animator animation) {
-						// TODO Auto-generated method stub
 						ballsManager.RestoreView(ball);
 					}
 					
 					@Override
 					public void onAnimationCancel(Animator animation) {
-						// TODO Auto-generated method stub
+						
 						
 					}
 				});
 				set.start();
 				
-				
 			}
 			
 			@Override
 			public void onAnimationCancel(Animator animation) {	
+				
 			}
 		});
 		va.start();
 	}
-
 	
 }
