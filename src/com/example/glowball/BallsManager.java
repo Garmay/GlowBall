@@ -22,8 +22,7 @@ public class BallsManager {
 	private ViewGroup container;
 	private Random random;
 	private int screenWidth;
-	private int heightRandomHeighten;
-	private int heightRandomMin;
+
 	public ColorGenerator colorGenerator;
 
 	public BallsManager(Context context, ViewGroup container) {
@@ -35,8 +34,6 @@ public class BallsManager {
 		((Activity) context).getWindowManager().getDefaultDisplay()
 				.getMetrics(displaymetrics);
 		screenWidth = displaymetrics.widthPixels;
-		heightRandomHeighten = (int) (displaymetrics.heightPixels * 0.2);
-		heightRandomMin = (int) (displaymetrics.heightPixels * 0.3);
 		colorGenerator = new ColorGenerator();
 	}
 
@@ -95,4 +92,7 @@ public class BallsManager {
 		}
 	}
 
+	public void clearCachedImages(){
+		restoredViewList.removeAll(restoredViewList);
+	}
 }
